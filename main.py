@@ -24,7 +24,7 @@ USAGE:
                            e.g. [not 0,a]
 '''
 
-used_letters = set()
+print(helpstr)
 
 while True:
     n = len(s)

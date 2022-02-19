@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import cmd2
 import os
+import sys
 from pathlib import Path
 
 def popularity(word):
@@ -15,6 +16,19 @@ def popularity(word):
 
 class Wordle(cmd2.Cmd):
     """Wordle helper!"""
+
+    def _initialize(self):
+        if not hasattr(self, 'initial_words'):
+            with open(self.dictionary_filename, 'r') as f:
+                self.initial_words = set(f.read().lower().split())
+                self.initial_words = list(filter(lambda x: len(x) == 5, self.initial_words))
+        self.words = self.initial_words[::]
+        self.prev_words = []
+
+        _ = os.system('clear')
+
+        self.print_cur_words()
+
     def __init__(self, dictionary_filename):
         super().__init__()
         self.hidden_commands.append('alias')
@@ -29,14 +43,10 @@ class Wordle(cmd2.Cmd):
         self.hidden_commands.append('set')
         self.hidden_commands.append('shell')
         self.hidden_commands.append('shortcuts')
-        self.prompt = '$ '
+        self.prompt = '(WORDLE HELPER) > '
 
-        with open(dictionary_filename, 'r') as f:
-            self.words = set(f.read().lower().split())
-            self.words = list(filter(lambda x: len(x) == 5, self.words))
-        self.prev_words = []
-
-        self.print_cur_words()
+        self.dictionary_filename = dictionary_filename
+        self._initialize()
 
     def print_cur_words(self): 
         # sort by unique letters, tie break by number of vowels
@@ -49,6 +59,12 @@ class Wordle(cmd2.Cmd):
             print(', etc...')
         else:
             print('')
+
+    def do_reset(self, _line):
+        """
+        Reset to include all words
+        """
+        self._initialize()
 
     def do_words(self, _line):
         """
@@ -76,16 +92,20 @@ class Wordle(cmd2.Cmd):
         at <index> <letter>
 
         Remove all words that don't have <letter> at <index>.
-        <index> is in [0, 4]
-        E.g. [at 0 a]
+        <index> is in [1, 5]
+        E.g. [at 1 a]
         """
         line = line.lower()
         line = line.split()
-        if len(line) != 2 or not line[0].isdigit() or int(line[0]) >= 5 or len(line[1]) != 1 or not line[1].isalpha():
+        if len(line) != 2 or not line[0].isdigit() or len(line[1]) != 1 or not line[1].isalpha():
+            self.do_help('at')
+            return
+        i = int(line[0])
+        if i < 1 or i > 5:
             self.do_help('at')
             return
         self.prev_words.append(self.words[::])
-        self.words = list(filter(lambda x: x[int(line[0])] == line[1], self.words))
+        self.words = list(filter(lambda x: x[i-1] == line[1], self.words))
         self.print_cur_words()
 
     def do_not(self, line):
@@ -93,16 +113,20 @@ class Wordle(cmd2.Cmd):
         not <index> <letter>
 
         Remove all words that have <letter> at <index>, as well as all word that don't have <letter> at all.
-        <index> is in [0, 4]
-        E.g. [not 0 a]
+        <index> is in [1, 5]
+        E.g. [at 1 a]
         """
         line = line.lower()
         line = line.split()
-        if len(line) != 2 or not line[0].isdigit() or int(line[0]) >= 5 or len(line[1]) != 1 or not line[1].isalpha():
+        if len(line) != 2 or not line[0].isdigit() or len(line[1]) != 1 or not line[1].isalpha():
+            self.do_help('not')
+            return
+        i = int(line[0])
+        if i < 1 or i > 5:
             self.do_help('not')
             return
         self.prev_words.append(self.words[::])
-        self.words = list(filter(lambda x: x[int(line[0])] != line[1] and line[1] in x, self.words))
+        self.words = list(filter(lambda x: x[i-1] != line[1] and line[1] in x, self.words))
         self.print_cur_words()
 
     def do_undo(self, _line):

@@ -3,9 +3,15 @@ import cmd2
 import os
 from pathlib import Path
 
-def hi() -> None:
-    print("hi")
-
+def popularity(word):
+    letters = [chr(97+i) for i in range(26)]
+    freqs = [7.8,2,4,3.8,11,1.4,3,2.3,8.2,0.21,2.5,5.3,2.7,7.2,6.1,2.8,0.24,7.3,8.7,6.7,3.3,1,0.91,0.27,1.6,0.44]
+    freqs = {k:v for k,v in zip(letters, freqs)}
+    word = set(word)
+    ret = 0
+    for c in word:
+        ret += freqs[c]
+    return ret
 
 class Wordle(cmd2.Cmd):
     """Wordle helper!"""
@@ -34,7 +40,7 @@ class Wordle(cmd2.Cmd):
 
     def print_cur_words(self): 
         # sort by unique letters, tie break by number of vowels
-        self.words.sort(key=lambda x:(len(set(x)), len(set('aeiou').intersection(x))), reverse=True)
+        self.words.sort(key=popularity, reverse=True)
         if not self.words:
             print("No words left!")
             return
@@ -111,7 +117,7 @@ class Wordle(cmd2.Cmd):
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    c = Wordle(Path(script_dir, "popular.txt"))
+    c = Wordle('/usr/share/dict/words')
     exit(c.cmdloop())
 
 

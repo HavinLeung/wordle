@@ -5,8 +5,6 @@ with open('/usr/share/dict/words') as f:
     s = f.read().split()
 s = list(set(map(lambda x: x.lower(), filter(lambda x: len(x) == 5,s))))
 
-history = []
-
 commands = [
     "rm",   # letter not used at all
     "at",   # fix a letter to index
@@ -27,6 +25,8 @@ USAGE:
 print(helpstr)
 
 while True:
+    # sort by unique letters, tie break by number of vowels
+    s.sort(key=lambda x: (len(set(x)), len(set('aeiou').intersection(x))), reverse=True)
     n = len(s)
     if n == 0:
         print("wtf no words left")
@@ -34,7 +34,7 @@ while True:
     print(f'{n} words left', end='')
     if n > 20:
         print('... here\'s 20 of them:')
-        print('   ', ', '.join(random.sample(s, 20)))
+        print('   ', ', '.join(s[:20]))
     else:
         print(':')
         print('   ', ', '.join(s))

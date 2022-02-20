@@ -1,4 +1,4 @@
-Wordle was annoying me so here's a toy program to help you solve it.
+[Wordle](https://www.nytimes.com/games/wordle/index.html) was annoying me so here's a toy program to help you solve it.
 
 ```
 havinleung@Macbook_Pro wordle % ./main.py

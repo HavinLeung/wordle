@@ -5,9 +5,7 @@ import sys
 from pathlib import Path
 
 def popularity(word):
-    letters = [chr(97+i) for i in range(26)]
-    freqs = [7.8,2,4,3.8,11,1.4,3,2.3,8.2,0.21,2.5,5.3,2.7,7.2,6.1,2.8,0.24,7.3,8.7,6.7,3.3,1,0.91,0.27,1.6,0.44]
-    freqs = {k:v for k,v in zip(letters, freqs)}
+    freqs = {'a': 0.109162760775664, 'b': 0.026651962135833103, 'c': 0.03547468063597096, 'd': 0.03424317617866005, 'e': 0.0972888521275618, 'f': 0.014851576141898722, 'g': 0.024703611800385994, 'h': 0.030364856171307783, 'i': 0.06363385718224428, 'j': 0.004484881904236743, 'k': 0.022277364212848084, 'l': 0.054333241430015625, 'm': 0.03172502527341237, 'n': 0.052678981711239775, 'o': 0.06523297491039426, 'p': 0.029335539012958368, 'q': 0.0018013050271114787, 'r': 0.06786140979689367, 's': 0.06716294458229942, 't': 0.05288116901020127, 'u': 0.043819501884018015, 'v': 0.010587262200165426, 'w': 0.014998621450234353, 'x': 0.004742211193824097, 'y': 0.033893943571362925, 'z': 0.0058082896792574215}
     word = set(word)
     ret = 0
     for c in word:
@@ -22,6 +20,7 @@ class Wordle(cmd2.Cmd):
             with open(self.dictionary_filename, 'r') as f:
                 self.initial_words = set(f.read().lower().split())
                 self.initial_words = list(filter(lambda x: len(x) == 5, self.initial_words))
+                self.initial_words.sort(key=popularity, reverse=True)
         self.words = self.initial_words[::]
         self.prev_words = []
 
@@ -49,8 +48,6 @@ class Wordle(cmd2.Cmd):
         self._initialize()
 
     def print_cur_words(self): 
-        # sort by unique letters, tie break by number of vowels
-        self.words.sort(key=popularity, reverse=True)
         if not self.words:
             print("No words left!")
             return

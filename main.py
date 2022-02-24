@@ -139,7 +139,7 @@ class Wordle(cmd2.Cmd):
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     c = Wordle('/usr/share/dict/words')
-    exit(c.cmdloop())
+    sys.exit(c.cmdloop())
 
 
 if __name__ == '__main__':
